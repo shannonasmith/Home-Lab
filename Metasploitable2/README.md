@@ -1,12 +1,11 @@
 <div align="center">
 
-# 🧠 Metasploitable2
-
-## Initial Access & Root Exploitation via Exposed Bindshell
+# 🧠 Metasploitable2  
+## Enumeration & Root Exploitation via Exposed Bindshell
 
 ![Category](https://img.shields.io/badge/Category-Network%20Exploitation-red?style=for-the-badge)
 ![Focus](https://img.shields.io/badge/Focus-Service%20Enumeration-blue?style=for-the-badge)
-![Method](https://img.shields.io/badge/Method-Direct%20Shell%20Access-success?style=for-the-badge)
+![Method](https://img.shields.io/badge/Method-Manual%20Exploitation-success?style=for-the-badge)
 
 </div>
 
@@ -14,130 +13,134 @@
 
 ### 🎯 Objective
 
-Perform reconnaissance and vulnerability analysis against a deliberately vulnerable Linux system (**Metasploitable2**) to identify exposed services and achieve root-level access.
+Perform enumeration on a vulnerable Linux system, identify exposed services, and determine a viable path to gain root-level access.
 
-The goal was to simulate a real-world penetration testing workflow by:
+The system contained multiple known vulnerabilities, requiring analysis to determine the most effective exploitation strategy.
 
-* enumerating open ports and services
-* identifying misconfigurations or vulnerabilities
-* exploiting the easiest attack path to gain access
-
-This lab focused on **network enumeration and initial access techniques**.
+This challenge focused on **service enumeration, vulnerability validation, and manual exploitation techniques**.
 
 ---
 
 ### 🖥 Environment
 
-| Tool            | Purpose                            |
-| --------------- | ---------------------------------- |
-| Kali Linux      | Attacker machine                   |
-| Metasploitable2 | Vulnerable target                  |
-| Nmap            | Service and version enumeration    |
-| Netcat          | Manual exploitation (shell access) |
-| VMware          | Virtual lab environment            |
+| Tool | Purpose |
+|-----|------|
+| Kali Linux | Attacker machine |
+| Metasploitable2 | Vulnerable target |
+| Nmap | Service enumeration |
+| Netcat | Exploitation |
 
 ---
 
-### 📦 Step 1 — Lab Setup & Connectivity
+### 📦 Step 1 — Perform Enumeration
 
-The lab environment was configured using two virtual machines:
+The target system was scanned:
 
-* **Kali Linux (attacker)**
-* **Metasploitable2 (target)**
+`nmap -sC -sV 192.168.74.129`
 
-Both systems were placed on the same NAT network to enable communication.
-
-Connectivity was verified by confirming both systems received IP addresses in the same subnet and successfully responding to ICMP requests.
+This revealed numerous open ports and services.
 
 ---
 
-### 🔍 Step 2 — Service Enumeration
+### 🔍 Step 2 — Analyze Exposed Services
 
-An Nmap scan was performed to identify open ports and running services on the target system.
+The scan identified multiple potential attack vectors.
 
-```bash
-nmap -sC -sV 192.168.74.129
-```
+Key finding:
 
----
+`1524/tcp open  bindshell`
 
-### 🔑 Key Findings
-
-| Port     | Service       | Version      | Notes                             |
-| -------- | ------------- | ------------ | --------------------------------- |
-| 21       | FTP           | vsftpd 2.3.4 | Known backdoor vulnerability      |
-| 23       | Telnet        | -            | Insecure remote access            |
-| 80       | HTTP          | Apache 2.2.8 | Web server                        |
-| 445      | SMB           | Samba 3.0.20 | Potential lateral movement vector |
-| **1524** | **bindshell** | -            | 🚨 Direct root access             |
-| 3306     | MySQL         | 5.0.51       | Database exposure                 |
-| 8180     | Tomcat        | 5.5          | Web application interface         |
+This indicated a service capable of providing direct shell access.
 
 ---
 
 #### 🔎 Analytical Observation
 
-The presence of an open service on port **1524** identified as a bindshell is a critical finding.
+A bindshell listens for incoming connections and can provide immediate command execution if exposed.
 
-A bindshell allows an attacker to connect directly to a listening service that provides command execution capabilities—often without authentication.
-
-This represents a **severe misconfiguration** and an immediate attack vector.
+This makes it a high-priority target during enumeration.
 
 ---
 
-### 🧪 Step 3 — Exploitation (Direct Shell Access)
+### 🧪 Step 3 — Attempt Alternative Exploit
 
-Given the exposed bindshell, exploitation focused on establishing a direct connection to the service.
+An attempt was made to exploit the vsftpd backdoor:
 
-```bash
-nc 192.168.74.129 1524
-```
+`nc 192.168.74.129 6200`
 
----
+📸 **Backdoor Attempt Failed**
 
-### 🔄 Step 4 — Access Validation
+<img src="../images/vsftpd_failed.png" width="700">
 
-Upon connecting to the service, a command shell was immediately available.
-
-```bash
-whoami
-```
-
-**Output:**
-
-```bash
-root
-```
-
-This confirmed that the service provided **unauthenticated root-level access**.
+The connection was refused, indicating the exploit path was not viable.
 
 ---
 
-### 🔐 Step 5 — Confirm Exploitation Success
+#### 🔎 Analytical Observation
 
-📸 **Root Shell via Netcat**
+Not all vulnerabilities are exploitable in practice.
 
-<img src="../images/metasploitable_bindshell_root.png" width="600">
+Effective attackers validate findings and pivot when necessary.
 
-The ability to obtain a root shell without authentication demonstrates a complete system compromise.
+---
+
+### 🔄 Step 4 — Pivot to Bindshell
+
+After the failed attempt, attention shifted to the bindshell on port 1524.
+
+This represented a simpler and more reliable attack path.
+
+---
+
+### 💥 Step 5 — Exploit the Bindshell
+
+A connection was established:
+
+`nc 192.168.74.129 1524`
+
+📸 **Root Shell Established**
+
+<img src="../images/root_shell.png" width="700">
+
+A shell was immediately obtained.
+
+---
+
+### 🔐 Step 6 — Confirm Root Access
+
+To verify privileges:
+
+`whoami`
+
+📸 **Privilege Confirmation**
+
+<img src="../images/whoami_root.png" width="700">
+
+Output:
+
+`root`
+
+This confirmed full system compromise.
 
 ---
 
 ## 🧠 Methodology Framework Applied
 
-```
-Network discovery
-      ↓
-Service enumeration
-      ↓
-Vulnerability identification
-      ↓
-Attack path prioritization
-      ↓
-Direct exploitation
-      ↓
-Privilege validation (root access)
-```
+
+Enumeration
+↓
+Service identification
+↓
+Exploit attempt
+↓
+Failure analysis
+↓
+Strategy pivot
+↓
+Successful exploitation
+↓
+Privilege verification
+
 
 ---
 
@@ -145,51 +148,45 @@ Privilege validation (root access)
 
 Primary techniques used:
 
-* network scanning (Nmap)
-* service enumeration
-* vulnerability identification
-* manual exploitation (Netcat)
+- network enumeration  
+- service analysis  
+- exploit validation  
+- manual shell access  
 
 Key concept investigated:
 
-```
-Exposed network services and unauthorized remote access
-```
+
+Service-based exploitation and attack path prioritization
+
 
 ---
 
 ## 🛡 Defensive Insight
 
-This scenario highlights the risks of exposing unnecessary or misconfigured services.
+Exposed services without authentication controls represent critical vulnerabilities.
 
-An open bindshell provides immediate system access and represents a critical failure in system hardening.
+Organizations should:
 
-To mitigate this type of vulnerability, organizations should:
-
-* restrict unnecessary open ports
-* enforce authentication on all remote services
-* implement firewall rules and network segmentation
-* monitor for unauthorized listening services
-* conduct regular vulnerability scans
-
-Systems should follow the principle of **least exposure**, minimizing the attack surface.
+- restrict unnecessary open ports  
+- enforce authentication  
+- implement segmentation  
+- monitor exposed services  
 
 ---
 
 ## 💡 Skills Reinforced
 
-* network enumeration and analysis
-* vulnerability identification
-* exploitation prioritization
-* manual shell access techniques
-* understanding of insecure service exposure
+- enumeration and analysis  
+- vulnerability identification  
+- exploit validation  
+- adaptive attack strategy  
 
 ---
 
 <div align="center">
 
-🔍 Enumeration reveals hidden attack paths
-💥 Misconfigured services lead to full compromise
-🔐 Reduce attack surface to improve security
+🔍 Enumeration reveals attack paths  
+💥 Simple misconfigurations lead to full compromise  
+🔐 Security depends on reducing exposed services  
 
 </div>
