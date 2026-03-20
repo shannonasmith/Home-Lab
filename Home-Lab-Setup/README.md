@@ -13,13 +13,13 @@
 
 ### 🎯 Objective
 
-Set up a functional cybersecurity home lab using VMware with Kali Linux and a vulnerable target machine.
+Build a functional cybersecurity home lab using Kali Linux and Metasploitable2 within VMware.
 
-During setup, the Kali system was unable to reach external repositories, preventing updates and indicating a network misconfiguration.
+During setup, Kali Linux was unable to reach external repositories, preventing updates and indicating a network misconfiguration.
 
-The goal was to diagnose and resolve the networking issue to establish a stable environment for future security testing.
+The goal was to diagnose and resolve the issue to establish a stable lab environment for future security testing.
 
-This challenge focused on **virtual networking, troubleshooting methodology, and system validation**.
+This challenge focused on **virtual networking, troubleshooting methodology, and environment validation**.
 
 ---
 
@@ -36,138 +36,100 @@ This challenge focused on **virtual networking, troubleshooting methodology, and
 
 ### 📦 Step 1 — Deploy Virtual Machines
 
-The setup began by importing prebuilt virtual machines into VMware.
+The lab environment was initialized by importing prebuilt virtual machines into VMware.
 
-Kali Linux was configured as the primary attacker system, while Metasploitable2 was added as a vulnerable target for testing.
+Kali Linux was configured as the attacker machine, and Metasploitable2 was prepared as the vulnerable target.
 
-Both systems were connected using a NAT network to allow internal communication and internet access.
+<img src="../images/Screenshot 2026-03-19 172119.png" width="700">
 
 ---
 
 ### 🔍 Step 2 — Identify Network Connectivity Issue
 
-While attempting to update Kali Linux, the following error was encountered:
+While attempting to update Kali, the following error was encountered:
 
+`sudo apt update`
 
-sudo apt update
+`Temporary failure resolving 'http.kali.org'`
 
-Temporary failure resolving 'http.kali.org'
-
-
-📸 **APT Update Failure**
-
-<img src="../images/kali_update_error.png" width="700">
-
-This indicated that the system was unable to resolve domain names, suggesting a DNS or network connectivity issue.
+<img src="../images/Screenshot 2026-03-19 190423.png" width="700">
 
 ---
 
 ### 🧪 Step 3 — Inspect Network Interface
 
-To investigate further, the network interface configuration was examined:
+`ip a`
 
+<img src="../images/Screenshot 2026-03-19 200537.png" width="700">
 
-ip a
-
-
-📸 **Interface Showing NO-CARRIER**
-
-<img src="../images/kali_no_carrier.png" width="700">
-
-The interface displayed **NO-CARRIER**, indicating that no active network connection was established.
+The interface showed no active connection.
 
 ---
 
-### 🔄 Step 4 — Analyze VMware Adapter Configuration
+### 🧰 Step 4 — Troubleshoot VMware Networking
 
-The virtual network adapter was reviewed within VMware settings.
+- Verified adapter settings  
+- Checked “connected” status (grayed out issue)  
 
-It was configured to use NAT, which should allow the VM to share the host’s internet connection.
-
-📸 **Network Adapter Configuration**
-
-<img src="../images/vmware_adapter_settings.png" width="700">
-
-This suggested that the issue was not with the adapter mode itself, but potentially with underlying VMware services or network configuration.
+<img src="../images/Screenshot 2026-03-19 172224.png" width="700">
+<img src="../images/Screenshot 2026-03-19 172325.png" width="700">
 
 ---
 
-### 🧰 Step 5 — Restart VMware Networking Services
+### 🔄 Step 5 — Reset Virtual Network Configuration
 
-To restore functionality, VMware networking services were restarted:
+Used Virtual Network Editor and restored defaults.
+
+<img src="../images/Screenshot 2026-03-19 191801.png" width="700">
+<img src="../images/Screenshot 2026-03-19 192023.png" width="700">
+
+---
+
+### 🔁 Step 6 — Restart VMware Services
+
+Restarted:
 
 - VMware NAT Service  
 - VMware DHCP Service  
 
-📸 **VMware Services**
-
-<img src="../images/vmware_services.png" width="500">
-
-Restarting these services can resolve issues related to IP assignment and network translation.
+<img src="../images/Screenshot 2026-03-19 192358.png" width="700">
 
 ---
 
-### 🛠 Step 6 — Reset Virtual Network Configuration
+### 🔄 Step 7 — Verify IP Assignment
 
-The VMware Virtual Network Editor was used to restore default network settings.
+`ip a`
 
-📸 **Virtual Network Editor**
+<img src="../images/Screenshot 2026-03-19 201134.png" width="700">
 
-<img src="../images/vmnet_editor.png" width="700">
+Result:
 
-This reset NAT and DHCP configurations to a known working state.
-
----
-
-### 🔁 Step 7 — Reconfigure Network Adapter
-
-The network adapter was removed and re-added to ensure proper attachment to the NAT network.
-
-This step helps resolve hidden configuration inconsistencies.
+`192.168.74.128`
 
 ---
 
-### 🔄 Step 8 — Verify IP Address Assignment
+### 🧪 Step 8 — Validate Connectivity
 
-After reconfiguration, the network interface was checked again:
+`ping -c 3 8.8.8.8`
 
-
-ip a
-
-
-📸 **IP Address Assigned**
-
-<img src="../images/kali_ip_success.png" width="700">
-
-A valid IP address was now assigned, confirming successful communication with the DHCP server.
+<img src="../images/Screenshot 2026-03-19 201834.png" width="700">
 
 ---
 
-### 🧪 Step 9 — Validate Network Connectivity
+### 🔄 Step 9 — Update System
 
-Connectivity was tested using ICMP requests:
+`sudo apt update && sudo apt full-upgrade -y`
 
-
-ping -c 3 8.8.8.8
-
-
-📸 **Successful Ping**
-
-<img src="../images/ping_success.png" width="700">
-
-The system successfully reached an external host, confirming network functionality.
+<img src="../images/Screenshot 2026-03-19 202118.png" width="700">
 
 ---
 
-### 🔄 Step 10 — Update System
+### 📦 Step 10 — Verify Final State
 
-With connectivity restored, the system was updated:
+System fully operational after troubleshooting.
 
-
-sudo apt update && sudo apt full-upgrade -y
-
-
-This confirmed that the networking issue had been fully resolved.
+<img src="../images/Screenshot 2026-03-19 202309.png" width="700">
+<img src="../images/Screenshot 2026-03-19 202350.png" width="700">
 
 ---
 
@@ -178,43 +140,12 @@ Environment setup
 ↓
 Failure identification
 ↓
-Interface inspection
-↓
-Configuration analysis
-↓
-Service troubleshooting
+Troubleshooting
 ↓
 Network reset
 ↓
-Validation testing
+Validation
 
-
----
-
-## 🛠 Techniques Used
-
-Primary techniques used:
-
-- virtual network troubleshooting  
-- DHCP validation  
-- interface inspection  
-- VMware service management  
-
-Key concept investigated:
-
-
-Virtual network configuration and troubleshooting
-
-
----
-
-## 🛡 Defensive Insight
-
-Misconfigured infrastructure can prevent systems from functioning correctly before any security testing begins.
-
-Understanding networking fundamentals is critical in both offensive and defensive cybersecurity roles.
-
-Proper configuration and validation are essential to ensure system reliability.
 
 ---
 
@@ -222,15 +153,12 @@ Proper configuration and validation are essential to ensure system reliability.
 
 - virtualization troubleshooting  
 - network diagnostics  
-- system configuration validation  
-- structured problem-solving  
+- system configuration  
 
 ---
 
 <div align="center">
 
 🧱 Strong labs start with stable infrastructure  
-🔧 Troubleshooting is a core cybersecurity skill  
-🌐 Networking fundamentals enable everything  
 
 </div>
