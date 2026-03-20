@@ -1,11 +1,11 @@
 <div align="center">
 
-# 🧠 Home Lab Setup  
-## VMware Networking & Kali Linux Environment Configuration
+# 🧱 Home Lab Setup  
+## Kali Linux + Metasploitable2 + SEC401 Lab Environment
 
-![Category](https://img.shields.io/badge/Category-Lab%20Setup-purple?style=for-the-badge)
-![Focus](https://img.shields.io/badge/Focus-Network%20Troubleshooting-blue?style=for-the-badge)
-![Method](https://img.shields.io/badge/Method-Virtualization%20Debugging-success?style=for-the-badge)
+![Category](https://img.shields.io/badge/Category-Home%20Lab-blue?style=for-the-badge)
+![Focus](https://img.shields.io/badge/Focus-Networking%20%26%20Setup-green?style=for-the-badge)
+![Platform](https://img.shields.io/badge/Platform-VMware-orange?style=for-the-badge)
 
 </div>
 
@@ -13,272 +13,160 @@
 
 ### 🎯 Objective
 
-Build a functional cybersecurity home lab using Kali Linux and Metasploitable2 within VMware.
+Build a functional cybersecurity lab environment using:
 
-During setup, Kali Linux was unable to reach external repositories, preventing updates and indicating a network misconfiguration.
+- Kali Linux (attacker machine)  
+- Metasploitable2 (target machine)  
+- Additional VMs used for SANS SEC401 labs  
 
-The goal was to diagnose and resolve the issue to establish a stable lab environment for future security testing.
-
-This challenge focused on **virtual networking, troubleshooting methodology, and environment validation**.
-
----
-
-### 🖥 Environment
-
-| Tool | Purpose |
-|-----|------|
-| VMware Workstation | Virtualization platform |
-| Kali Linux | Attacker machine |
-| Metasploitable2 | Vulnerable target |
-| NAT networking | Internal VM communication |
+The goal was to establish reliable networking, resolve connectivity issues, and prepare the lab for offensive security testing.
 
 ---
 
-### 📦 Step 1 — Deploy the Lab Environment
+### 🧱 Lab Environment
 
-The lab environment was initialized by importing prebuilt virtual machines into VMware.
+## 🖥️ Attacker Machine
 
-Kali Linux was configured as the attacker machine, and Metasploitable2 was prepared as the vulnerable target.
+- OS: Kali Linux (VMware)
+- Network: NAT
 
-Both systems were placed on a NAT network to allow communication and internet access.
+## 🎯 Target Machine
 
-📸 **Kali Linux VM in VMware**
+- OS: Metasploitable2
+- Network: NAT
 
-<img src="../images/Screenshot 2026-03-19 172325.png" width="700">
+## 🧪 Additional Lab Systems
 
----
-
-### 🔍 Step 2 — Identify Network Connectivity Issue
-
-While attempting to update Kali, the following error was encountered:
-
-`sudo apt update`
-
-`Temporary failure resolving 'http.kali.org'`
-
-📸 **APT Update Failure**
-
-<img src="../images/Screenshot 2026-03-19 190423.png" width="700">
-
-This indicated a DNS resolution failure and suggested the VM was not successfully reaching the network.
+- Additional VMs configured for **SANS SEC401 labs**
+- Used for expanded exercises beyond Metasploitable2
 
 ---
 
-### 🧪 Step 3 — Inspect the Network Interface
+### ⚙️ Step 1 — Initial Kali Setup
 
-The network interface was examined to confirm whether Kali had an active connection.
+Imported Kali Linux VM and attempted system update:
 
-`ip a`
+```bash
+sudo apt update && sudo apt full-upgrade -y
+```
 
-📸 **Interface Showing No Active Carrier**
+📸 **Update Attempt**
 
-<img src="../images/Screenshot 2026-03-19 191801.png" width="700">
-
-The interface showed **NO-CARRIER**, confirming that the system was not connected to the network.
-
----
-
-### 🔄 Step 4 — Review VMware Adapter Settings
-
-The virtual network adapter was reviewed inside VMware.
-
-It was configured for NAT, but the connection state and adapter behavior indicated that networking was still not functioning correctly.
-
-📸 **VMware Network Adapter Settings**
-
-<img src="../images/Screenshot 2026-03-19 190728.png" width="700">
-
-This suggested the problem was not simply the adapter mode, but potentially the VMware network stack itself.
+<img src="../images/Screenshot_2026-03-19_19_02_39.png" width="600">
 
 ---
 
-### 🧰 Step 5 — Review VMware Networking Services
+### ❌ Step 2 — Network Failure
 
-To restore VMware networking, the relevant Windows services were checked and restarted.
-
-The key services involved were:
-
-- VMware NAT Service  
-- VMware DHCP Service  
-
-📸 **VMware Services**
-
-<img src="../images/Screenshot 2026-03-19 192023.png" width="700">
-
-These services are responsible for address assignment and NAT translation for the guest machines.
-
----
-
-### 🛠 Step 6 — Reset Virtual Network Configuration
-
-The VMware Virtual Network Editor was used to restore default network settings.
-
-📸 **Virtual Network Editor**
-
-<img src="../images/Screenshot 2026-03-19 192358.png" width="700">
-
-Resetting the virtual network helped restore a known-good NAT and DHCP configuration.
-
----
-
-### 🔁 Step 7 — Recheck Interface State After Troubleshooting
-
-After restarting services, restoring defaults, and reconfiguring the adapter, the interface was checked again.
-
-`ip a`
-
-📸 **Kali Interface Now Receiving an IP Address**
-
-<img src="../images/Screenshot 2026-03-19 193157.png" width="700">
-
-The system now showed a valid address on the NAT network.
-
-Result:
-
-`inet 192.168.74.128`
-
-This confirmed successful communication with the DHCP server.
-
----
-
-### 🧪 Step 8 — Validate Internet Connectivity
-
-Connectivity was tested by sending ICMP requests to an external host.
-
-`ping -c 3 8.8.8.8`
-
-📸 **Successful Ping Test**
-
-<img src="../images/Screenshot 2026-03-19 193252.png" width="700">
-
-The system successfully reached an external address, confirming that the network issue had been resolved.
-
----
-
-### 🔄 Step 9 — Update the Kali System
-
-With connectivity restored, the Kali system was updated.
-
-`sudo apt update && sudo apt full-upgrade -y`
-
-`sudo apt autoremove -y`
-
-`reboot`
-
-This ensured the attacker machine was fully updated before continuing with the lab.
-
----
-
-### 📦 Step 10 — Import and Boot the Target Machine
-
-Metasploitable2 was imported into VMware and powered on as the vulnerable target.
-
-📸 **Metasploitable2 Booted and Ready**
-
-<img src="../images/Screenshot 2026-03-19 200537.png" width="700">
-
-After boot, the system was accessed using the default credentials.
-
-📸 **Metasploitable2 Login Complete**
-
-<img src="../images/Screenshot 2026-03-19 200810.png" width="700">
-
----
-
-### 🔍 Step 11 — Verify Target Network Assignment
-
-The target machine’s interface configuration was checked to confirm that it was on the same NAT network as Kali.
-
-`ip a`
-
-📸 **Metasploitable2 IP Address**
-
-<img src="../images/Screenshot 2026-03-19 201134.png" width="700">
-
-Result:
-
-`192.168.74.129`
-
-From Kali, this confirmed that both machines were now positioned for enumeration and exploitation.
-
----
-
-### 🧩 Step 12 — Note on VMware Tools
-
-An attempt to use VMware Tools on the legacy Linux target generated a compatibility warning.
-
-📸 **VMware Tools Warning**
-
-<img src="../images/Screenshot 2026-03-19 201000.png" width="700">
-
-This did not affect the lab objective, since VMware Tools were not required for scanning or exploitation.
-
----
-
-## 🧠 Methodology Framework Applied
+Encountered DNS resolution error:
 
 ```
-Environment setup
-      ↓
-Failure identification
-      ↓
-Interface inspection
-      ↓
-Adapter analysis
-      ↓
-Service troubleshooting
-      ↓
-Network reset
-      ↓
-Connectivity validation
-      ↓
-Target onboarding
+Temporary failure resolving 'http.kali.org'
+```
+
+📸 **Error Output**
+
+<img src="../images/Screenshot_2026-03-19_19_04_10.png" width="600">
+
+---
+
+### 🔧 Step 3 — Troubleshooting Network
+
+Verified network interfaces:
+
+```bash
+ip a
+```
+
+📸 **Interface Down**
+
+<img src="../images/Screenshot_2026-03-19_19_17_53.png" width="600">
+
+---
+
+### 🛠 Fix Applied
+
+- Enabled VMware network adapter  
+- Restarted VMware NAT & DHCP services  
+- Restored default virtual network settings  
+- Re-added network adapter  
+
+---
+
+### ✅ Step 4 — Network Restored
+
+Confirmed valid IP assignment:
+
+```bash
+ip a
+```
+
+📸 **Interface Up**
+
+<img src="../images/Screenshot_2026-03-19_20_08_36.png" width="600">
+
+---
+
+### 🔄 Step 5 — System Update (Successful)
+
+```bash
+sudo apt update && sudo apt full-upgrade -y
+sudo apt autoremove -y
+reboot
 ```
 
 ---
 
-## 🛠 Techniques Used
+### 🧱 Step 6 — Import Metasploitable2
 
-Primary techniques used:
+- Imported `.vmx` file  
+- Set network to NAT  
 
-- virtual network troubleshooting  
-- DHCP validation  
-- interface inspection  
-- VMware service management  
-- NAT configuration review  
+---
 
-Key concept investigated:
+### 🌐 Step 7 — Verify Connectivity
 
+From Kali:
+
+```bash
+ping 192.168.74.129
 ```
-Virtual network configuration and troubleshooting
+
+📸 **Ping Success**
+
+<img src="../images/Screenshot_2026-03-19_20_13_07.png" width="600">
+<img src="../images/Screenshot_2026-03-19_20_13_19.png" width="600">
+
+---
+
+### 📁 Lab Structure
+
+```bash
+~/lab/
+├── ctf/
+├── notes/
+├── loot/
+├── scripts/
+├── writeups/
+│   └── metasploitable2/
 ```
 
 ---
 
-## 🛡 Defensive Insight
+### 🧠 Key Takeaways
 
-Misconfigured infrastructure can prevent systems from functioning before security testing even begins.
-
-Understanding virtual networking fundamentals is critical in both offensive and defensive cybersecurity roles.
-
-Reliable lab setup depends on validating connectivity, IP assignment, and service behavior before moving into exploitation.
-
----
-
-## 💡 Skills Reinforced
-
-- virtualization troubleshooting  
-- network diagnostics  
-- system configuration validation  
-- structured problem-solving  
-- lab environment preparation  
+- Successfully configured VMware networking  
+- Resolved DNS and connectivity issues  
+- Verified communication between attacker and target  
+- Integrated additional SEC401 lab machines  
+- Built a stable foundation for exploitation labs  
 
 ---
 
 <div align="center">
 
-🧱 Strong labs start with stable infrastructure  
-🔧 Troubleshooting is a core cybersecurity skill  
-🌐 Networking fundamentals enable everything  
+🧱 Lab environment successfully deployed  
+🌐 Networking issues resolved  
+🚀 Ready for exploitation and analysis  
 
 </div>
