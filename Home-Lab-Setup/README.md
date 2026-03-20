@@ -34,13 +34,17 @@ This challenge focused on **virtual networking, troubleshooting methodology, and
 
 ---
 
-### 📦 Step 1 — Deploy Virtual Machines
+### 📦 Step 1 — Deploy the Lab Environment
 
 The lab environment was initialized by importing prebuilt virtual machines into VMware.
 
 Kali Linux was configured as the attacker machine, and Metasploitable2 was prepared as the vulnerable target.
 
-<img src="../images/Screenshot 2026-03-19 172119.png" width="700">
+Both systems were placed on a NAT network to allow communication and internet access.
+
+📸 **Kali Linux VM in VMware**
+
+<img src="../images/Screenshot 2026-03-19 172325.png" width="700">
 
 ---
 
@@ -52,100 +56,212 @@ While attempting to update Kali, the following error was encountered:
 
 `Temporary failure resolving 'http.kali.org'`
 
+📸 **APT Update Failure**
+
 <img src="../images/Screenshot 2026-03-19 190423.png" width="700">
+
+This indicated a DNS resolution failure and suggested the VM was not successfully reaching the network.
 
 ---
 
-### 🧪 Step 3 — Inspect Network Interface
+### 🧪 Step 3 — Inspect the Network Interface
+
+The network interface was examined to confirm whether Kali had an active connection.
 
 `ip a`
 
-<img src="../images/Screenshot 2026-03-19 200537.png" width="700">
-
-The interface showed no active connection.
-
----
-
-### 🧰 Step 4 — Troubleshoot VMware Networking
-
-- Verified adapter settings  
-- Checked “connected” status (grayed out issue)  
-
-<img src="../images/Screenshot 2026-03-19 172224.png" width="700">
-<img src="../images/Screenshot 2026-03-19 172325.png" width="700">
-
----
-
-### 🔄 Step 5 — Reset Virtual Network Configuration
-
-Used Virtual Network Editor and restored defaults.
+📸 **Interface Showing No Active Carrier**
 
 <img src="../images/Screenshot 2026-03-19 191801.png" width="700">
-<img src="../images/Screenshot 2026-03-19 192023.png" width="700">
+
+The interface showed **NO-CARRIER**, confirming that the system was not connected to the network.
 
 ---
 
-### 🔁 Step 6 — Restart VMware Services
+### 🔄 Step 4 — Review VMware Adapter Settings
 
-Restarted:
+The virtual network adapter was reviewed inside VMware.
+
+It was configured for NAT, but the connection state and adapter behavior indicated that networking was still not functioning correctly.
+
+📸 **VMware Network Adapter Settings**
+
+<img src="../images/Screenshot 2026-03-19 190728.png" width="700">
+
+This suggested the problem was not simply the adapter mode, but potentially the VMware network stack itself.
+
+---
+
+### 🧰 Step 5 — Review VMware Networking Services
+
+To restore VMware networking, the relevant Windows services were checked and restarted.
+
+The key services involved were:
 
 - VMware NAT Service  
 - VMware DHCP Service  
 
-<img src="../images/Screenshot 2026-03-19 192358.png" width="700">
+📸 **VMware Services**
+
+<img src="../images/Screenshot 2026-03-19 192023.png" width="700">
+
+These services are responsible for address assignment and NAT translation for the guest machines.
 
 ---
 
-### 🔄 Step 7 — Verify IP Assignment
+### 🛠 Step 6 — Reset Virtual Network Configuration
+
+The VMware Virtual Network Editor was used to restore default network settings.
+
+📸 **Virtual Network Editor**
+
+<img src="../images/Screenshot 2026-03-19 192358.png" width="700">
+
+Resetting the virtual network helped restore a known-good NAT and DHCP configuration.
+
+---
+
+### 🔁 Step 7 — Recheck Interface State After Troubleshooting
+
+After restarting services, restoring defaults, and reconfiguring the adapter, the interface was checked again.
 
 `ip a`
+
+📸 **Kali Interface Now Receiving an IP Address**
+
+<img src="../images/Screenshot 2026-03-19 193157.png" width="700">
+
+The system now showed a valid address on the NAT network.
+
+Result:
+
+`inet 192.168.74.128`
+
+This confirmed successful communication with the DHCP server.
+
+---
+
+### 🧪 Step 8 — Validate Internet Connectivity
+
+Connectivity was tested by sending ICMP requests to an external host.
+
+`ping -c 3 8.8.8.8`
+
+📸 **Successful Ping Test**
+
+<img src="../images/Screenshot 2026-03-19 193252.png" width="700">
+
+The system successfully reached an external address, confirming that the network issue had been resolved.
+
+---
+
+### 🔄 Step 9 — Update the Kali System
+
+With connectivity restored, the Kali system was updated.
+
+`sudo apt update && sudo apt full-upgrade -y`
+
+`sudo apt autoremove -y`
+
+`reboot`
+
+This ensured the attacker machine was fully updated before continuing with the lab.
+
+---
+
+### 📦 Step 10 — Import and Boot the Target Machine
+
+Metasploitable2 was imported into VMware and powered on as the vulnerable target.
+
+📸 **Metasploitable2 Booted and Ready**
+
+<img src="../images/Screenshot 2026-03-19 200537.png" width="700">
+
+After boot, the system was accessed using the default credentials.
+
+📸 **Metasploitable2 Login Complete**
+
+<img src="../images/Screenshot 2026-03-19 200810.png" width="700">
+
+---
+
+### 🔍 Step 11 — Verify Target Network Assignment
+
+The target machine’s interface configuration was checked to confirm that it was on the same NAT network as Kali.
+
+`ip a`
+
+📸 **Metasploitable2 IP Address**
 
 <img src="../images/Screenshot 2026-03-19 201134.png" width="700">
 
 Result:
 
-`192.168.74.128`
+`192.168.74.129`
+
+From Kali, this confirmed that both machines were now positioned for enumeration and exploitation.
 
 ---
 
-### 🧪 Step 8 — Validate Connectivity
+### 🧩 Step 12 — Note on VMware Tools
 
-`ping -c 3 8.8.8.8`
+An attempt to use VMware Tools on the legacy Linux target generated a compatibility warning.
 
-<img src="../images/Screenshot 2026-03-19 201834.png" width="700">
+📸 **VMware Tools Warning**
 
----
+<img src="../images/Screenshot 2026-03-19 201000.png" width="700">
 
-### 🔄 Step 9 — Update System
-
-`sudo apt update && sudo apt full-upgrade -y`
-
-<img src="../images/Screenshot 2026-03-19 202118.png" width="700">
-
----
-
-### 📦 Step 10 — Verify Final State
-
-System fully operational after troubleshooting.
-
-<img src="../images/Screenshot 2026-03-19 202309.png" width="700">
-<img src="../images/Screenshot 2026-03-19 202350.png" width="700">
+This did not affect the lab objective, since VMware Tools were not required for scanning or exploitation.
 
 ---
 
 ## 🧠 Methodology Framework Applied
 
-
+```
 Environment setup
-↓
+      ↓
 Failure identification
-↓
-Troubleshooting
-↓
+      ↓
+Interface inspection
+      ↓
+Adapter analysis
+      ↓
+Service troubleshooting
+      ↓
 Network reset
-↓
-Validation
+      ↓
+Connectivity validation
+      ↓
+Target onboarding
+```
 
+---
+
+## 🛠 Techniques Used
+
+Primary techniques used:
+
+- virtual network troubleshooting  
+- DHCP validation  
+- interface inspection  
+- VMware service management  
+- NAT configuration review  
+
+Key concept investigated:
+
+```
+Virtual network configuration and troubleshooting
+```
+
+---
+
+## 🛡 Defensive Insight
+
+Misconfigured infrastructure can prevent systems from functioning before security testing even begins.
+
+Understanding virtual networking fundamentals is critical in both offensive and defensive cybersecurity roles.
+
+Reliable lab setup depends on validating connectivity, IP assignment, and service behavior before moving into exploitation.
 
 ---
 
@@ -153,12 +269,16 @@ Validation
 
 - virtualization troubleshooting  
 - network diagnostics  
-- system configuration  
+- system configuration validation  
+- structured problem-solving  
+- lab environment preparation  
 
 ---
 
 <div align="center">
 
 🧱 Strong labs start with stable infrastructure  
+🔧 Troubleshooting is a core cybersecurity skill  
+🌐 Networking fundamentals enable everything  
 
 </div>
