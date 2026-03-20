@@ -1,61 +1,72 @@
-🧠 Home Lab Setup
-VMware Network Troubleshooting & Kali Environment Configuration
+<div align="center">
 
+# 🧠 Home Lab Setup  
+## VMware Networking & Kali Configuration Troubleshooting
 
+![Category](https://img.shields.io/badge/Category-Lab%20Setup-purple?style=for-the-badge)
+![Focus](https://img.shields.io/badge/Focus-Network%20Troubleshooting-blue?style=for-the-badge)
+![Method](https://img.shields.io/badge/Method-Virtualization-success?style=for-the-badge)
 
+</div>
 
+---
 
+### 🎯 Objective
 
-🎯 Objective
+Set up a functional cybersecurity lab environment using VMware and resolve network connectivity issues preventing system updates.
 
-Build a functional cybersecurity lab using VMware and resolve networking issues preventing system updates and connectivity.
+The goal was to ensure:
+- stable virtual networking  
+- proper IP assignment  
+- internet connectivity for Kali  
 
-🖥 Environment
-Component	Details
-Hypervisor	VMware Workstation
-Attacker	Kali Linux
-Target	Metasploitable2
-Network	NAT
-📦 Step 1 — Lab Deployment
+---
 
-Virtual machines were imported into VMware.
+### 🖥 Environment
 
-📸 VMware Lab Environment
+| Component | Purpose |
+|----------|--------|
+| VMware Workstation | Virtualization platform |
+| Kali Linux | Attacker machine |
+| Metasploitable2 | Vulnerable target |
+| NAT Network | VM communication |
 
+---
 
+### 📦 Step 1 — Initial Lab Deployment
 
-🔍 Step 2 — Network Failure
+Virtual machines were imported and configured in VMware.
+
+📸 **VMware Lab Environment**
+
+<img src="../images/vmware_lab_overview.png" width="700">
+
+---
+
+### 🔍 Step 2 — Identify Network Failure
 
 Kali update failed with:
 
+```bash
 Temporary failure resolving 'http.kali.org'
 
-📸 APT Failure
+📸 APT Update Failure
 
-
-
-🧪 Step 3 — Interface Analysis
+<img src="../images/kali_update_error.png" width="700">
+🧪 Step 3 — Inspect Network Interface
 ip a
 
-📸 No Carrier / Interface Down
+📸 Interface Showing NO-CARRIER
 
+<img src="../images/kali_no_carrier.png" width="700">
+🔄 Step 4 — Review VMware Adapter Settings
 
+The adapter was configured as NAT but not properly connected.
 
-🔄 Step 4 — VMware Adapter Issue
+📸 Network Adapter Configuration
 
-The adapter was:
-
-Set to NAT
-
-Not properly connected
-
-“Connected” option unavailable
-
-📸 Adapter Configuration
-
-
-
-🧰 Step 5 — Service Troubleshooting
+<img src="../images/vmware_adapter_settings.png" width="700">
+🧰 Step 5 — Restart VMware Services
 
 Restarted:
 
@@ -65,52 +76,77 @@ VMware DHCP Service
 
 📸 VMware Services
 
-
-
-🛠 Step 6 — Network Reset
+<img src="../images/vmware_services.png" width="500">
+🛠 Step 6 — Reset Virtual Network
 
 Used Virtual Network Editor → Restore Defaults
 
-📸 VMnet Configuration
+📸 Virtual Network Editor
 
+<img src="../images/vmnet_editor.png" width="700">
+🔁 Step 7 — Rebuild Network Adapter
 
-
-🔁 Step 7 — Adapter Rebuild
-
-Removed network adapter
+Removed existing adapter
 
 Re-added NAT adapter
 
-✅ Step 8 — Connectivity Restored
+✅ Step 8 — Confirm Connectivity
 ip a
 
-📸 IP Assigned
+📸 IP Address Assigned
 
-
-
-🧪 Step 9 — Verification
+<img src="../images/kali_ip_success.png" width="700">
+🧪 Step 9 — Verify Internet Access
 ping -c 3 8.8.8.8
 
-📸 Ping Success
+📸 Successful Ping
 
-
-
-🧠 Methodology
-Deployment → Failure → Analysis → Services → Reset → Rebuild → Validation
+<img src="../images/ping_success.png" width="700">
+🔄 Step 10 — Update System
+sudo apt update && sudo apt full-upgrade -y
+🧠 Methodology Framework Applied
+Deployment
+   ↓
+Failure identification
+   ↓
+Interface inspection
+   ↓
+Service troubleshooting
+   ↓
+Network reset
+   ↓
+Adapter rebuild
+   ↓
+Connectivity validation
 🛠 Techniques Used
 
-Virtual networking troubleshooting
+virtual network troubleshooting
 
 DHCP validation
 
-Service management
+interface inspection
 
-Interface debugging
+VMware service management
 
-🛡 Key Insight
+🛡 Defensive Insight
 
-Virtual networking issues can completely block system functionality.
-Understanding infrastructure is essential before security testing.
+Misconfigured virtual networking can completely prevent system functionality.
+
+Understanding infrastructure is critical before performing security testing.
+
+💡 Skills Reinforced
+
+virtualization troubleshooting
+
+network debugging
+
+system configuration
+
+problem-solving methodology
+
+<div align="center">
 
 🧱 Strong labs start with stable infrastructure
 🔧 Debugging is a core cybersecurity skill
+
+</div> ```
