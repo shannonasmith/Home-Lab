@@ -54,7 +54,7 @@ Subdomain discovery was performed to expand the attack surface and identify addi
 📸 Figure 1 — Subdomain Enumeration
 
 <div align="center">
-  <img src="images/Screenshot 3.png" width="600">
+  <img src="../images/image 28.png" width="600">
 </div>
 
 <p align="center"><em>Subdomain enumeration revealed additional hosts associated with the target domain, increasing the potential attack surface.</em></p>
@@ -70,7 +70,7 @@ Subdomain discovery was performed to expand the attack surface and identify addi
 ### 📸 Figure 2 — ffuf Enumeration
 
 <div align="center">
-  <img src="images/Screenshot 1.png" width="600">
+  <img src="../images/image 27.png" width="600">
 </div>
 
 <p align="center"><em>ffuf was used to fuzz web endpoints and identify hidden application paths using a common wordlist.</em></p>
@@ -80,7 +80,7 @@ Subdomain discovery was performed to expand the attack surface and identify addi
 ### 📸 Figure 3 — dirb Directory Discovery
 
 <div align="center">
-  <img src="images/Screenshot 2.png" width="600">
+  <img src="../images/image 28.png" width="600">
 </div>
 
 <p align="center"><em>dirb confirmed the existence of multiple directories and files, including sensitive resources such as logs and private directories.</em></p>
@@ -94,10 +94,10 @@ Network reconnaissance was conducted to identify exposed services and potential 
 ### 📸 Figure 4 — Nmap Scan Results
 
 <div align="center">
-  <img src="images/Screenshot 4.png" width="600">
+  <img src="../images/image 100.png" width="600">
 </div>
 
-<p align="center"><em>Nmap identified multiple open ports and services, including SSH, HTTP, SMTP, and FTP-related services.</em></p>
+<p align="center"><em>Nmap identified multiple open ports and services, including SSH, HTTP, SMTP, and POP3.</em></p>
 
 ---
 
@@ -109,7 +109,7 @@ Analysis of the scan results revealed:
 - potential misconfigurations  
 - services suitable for further exploitation  
 
-Particular attention was given to services allowing authentication or file transfer.
+Additional scans confirmed UDP services and RPC exposure.
 
 ---
 
@@ -120,7 +120,7 @@ An exposed FTP service was accessed using valid credentials, allowing interactio
 ### 📸 Figure 5 — FTP Access and File Retrieval
 
 <div align="center">
-  <img src="images/Screenshot 7.png" width="600">
+  <img src="../images/image 129.png" width="600">
 </div>
 
 <p align="center"><em>Successful FTP authentication allowed directory listing and retrieval of sensitive files, demonstrating unauthorized access to system data.</em></p>
