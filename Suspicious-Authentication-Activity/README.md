@@ -17,7 +17,7 @@ During routine monitoring, unusual authentication activity was identified within
 
 The activity included repeated login attempts, irregular access patterns, and potential indicators of unauthorized access.
 
-This project simulates a **Security Operations Center (SOC)** investigation using Splunk to analyze authentication logs and identify suspicious behavior.
+This project simulates a **SOC investigation** using Splunk to analyze authentication logs.
 
 ---
 
@@ -34,98 +34,144 @@ This project simulates a **Security Operations Center (SOC)** investigation usin
 
 | Source | Description |
 |---|---|
-| linux_s_30DAY.log | Linux authentication and system activity logs |
-| Splunk SIEM | Log ingestion, search, and analysis platform |
+| linux_s_30DAY.log | Linux authentication logs |
+| Splunk SIEM | Log analysis platform |
 
 ---
 
 ## 🚨 Detection
 
-Initial indicators of suspicious activity included:
+Indicators observed:
 
 - multiple failed login attempts  
-- repeated authentication attempts from the same source  
-- unusual login times  
-- activity from unfamiliar hosts  
+- repeated authentication attempts from same IP  
+- unusual login timing  
+- unfamiliar source hosts  
 
 ---
 
-### 📊 Detection Query (Failed Logins)
+### 📊 Detection — Failed Logins
 
 ```spl
 index=main sourcetype=linux_secure "Failed password"
 | stats count by user, src_ip
 | sort -count
+```
 
-➡️ Identifies accounts with repeated failed login attempts
+➡️ Identifies brute-force style activity  
 
-📊 Detection Query (Successful Logins)
+---
+
+### 📊 Detection — Successful Logins
+
+```spl
 index=main sourcetype=linux_secure "Accepted password"
 | stats count by user, src_ip
+```
 
-➡️ Highlights successful authentication patterns
+➡️ Shows successful authentication patterns  
 
-🔍 Investigation
-Step 1 — Identify Targeted Accounts
-reviewed users with high failed login counts
-identified accounts potentially targeted by brute force attempts
-Step 2 — Correlate Successful Logins
-checked if failed attempts were followed by successful logins
-identified potential account compromise scenarios
-Step 3 — Analyze Source IP Activity
+---
+
+## 🔍 Investigation
+
+### Step 1 — Identify Targeted Accounts
+
+- users with high failed login counts  
+- accounts under repeated attack  
+
+---
+
+### Step 2 — Correlate Success After Failures
+
+- identify successful logins after failed attempts  
+- detect possible compromise  
+
+---
+
+### Step 3 — Analyze Source IP Activity
+
+```spl
 index=main sourcetype=linux_secure
 | stats count by src_ip
 | sort -count
+```
 
-➡️ Identifies top source IPs generating authentication activity
+➡️ Identifies top attacking sources  
 
-Step 4 — Review Login Timing
-analyzed timestamps of login attempts
-identified unusual access times (off-hours activity)
-🌐 Analysis
+---
 
-Observed patterns included:
+### Step 4 — Analyze Login Timing
 
-repeated login attempts targeting specific users
-multiple authentication attempts from single IP addresses
-sequences of failed logins followed by success
+- review timestamps  
+- identify off-hours activity  
 
-These behaviors may indicate:
+---
 
-brute-force attacks
-credential stuffing
-compromised accounts
-⚠️ Findings
-suspicious authentication patterns identified
-evidence of repeated login attempts
-potential unauthorized access activity
-abnormal user behavior detected
-🛡️ Response Actions
-Containment
-lock affected user accounts
-block suspicious IP addresses
-Investigation
-review additional logs (network, endpoint)
-correlate with other security alerts
-Prevention
-enforce strong password policies
-implement account lockout thresholds
-enable multi-factor authentication
-📊 Key Takeaways
-authentication logs provide critical detection signals
-repeated login attempts are strong indicators of attack activity
-correlation of failed and successful logins is essential
-SIEM tools enable efficient investigation and visibility
-💡 Skills Demonstrated
-Splunk SIEM usage
-log analysis and correlation
-authentication investigation
-detection query development (SPL)
-SOC investigation workflow
+## 🌐 Analysis
+
+Observed patterns:
+
+- repeated login attempts  
+- multiple attempts from single IP  
+- failures followed by success  
+
+➡️ Possible indicators:
+
+- brute-force attack  
+- credential stuffing  
+- compromised account  
+
+---
+
+## ⚠️ Findings
+
+- suspicious login behavior identified  
+- repeated authentication attempts detected  
+- abnormal access patterns observed  
+
+---
+
+## 🛡️ Response Actions
+
+### Containment
+- lock affected accounts  
+- block suspicious IPs  
+
+### Investigation
+- review endpoint + network logs  
+- correlate with other alerts  
+
+### Prevention
+- enforce strong passwords  
+- enable account lockout policies  
+- implement MFA  
+
+---
+
+## 📊 Key Takeaways
+
+- authentication logs are critical detection sources  
+- failed login spikes indicate attack attempts  
+- correlation is key to identifying compromise  
+- SIEM enables efficient investigation  
+
+---
+
+## 💡 Skills Demonstrated
+
+- Splunk SIEM usage  
+- log analysis and correlation  
+- authentication investigation  
+- SPL query development  
+- SOC workflow execution  
+
+---
+
 <div align="center">
 
-🔐 Authentication logs reveal attacker intent
-📊 Correlation turns data into insight
-🛡️ Detection enables response
+🔐 **Authentication logs reveal attacker behavior**  
+📊 **Correlation turns logs into insight**  
+🛡️ **Detection enables response**
 
-</div> ```
+</div>
