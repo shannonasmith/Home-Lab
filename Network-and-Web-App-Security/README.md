@@ -51,14 +51,6 @@ Data Retrieval
 
 Subdomain discovery was performed to expand the attack surface and identify additional entry points.
 
-📸 Figure 1 — Subdomain Enumeration
-
-<div align="center">
-  <img src="../images/image 171.png" width="600">
-</div>
-
-<p align="center"><em>Subdomain enumeration revealed additional hosts associated with the target domain, increasing the potential attack surface.</em></p>
-
 ---
 
 ## 🔍 Step 2 — Web Enumeration
@@ -67,7 +59,7 @@ Subdomain discovery was performed to expand the attack surface and identify addi
 - ffuf → targeted endpoint fuzzing  
 - dirb → directory discovery and validation  
 
-### 📸 Figure 2 — ffuf Enumeration
+### 📸 Figure 1 — ffuf Enumeration
 
 <div align="center">
   <img src="../images/image 27.png" width="600">
@@ -77,7 +69,7 @@ Subdomain discovery was performed to expand the attack surface and identify addi
 
 ---
 
-### 📸 Figure 3 — dirb Directory Discovery
+### 📸 Figure 2 — dirb Directory Discovery
 
 <div align="center">
   <img src="../images/image 28.png" width="600">
@@ -91,7 +83,7 @@ Subdomain discovery was performed to expand the attack surface and identify addi
 
 Network reconnaissance was conducted to identify exposed services and potential attack vectors.
 
-### 📸 Figure 4 — Nmap Scan Results
+### 📸 Figure 3 — Nmap Scan Results
 
 <div align="center">
   <img src="../images/image 100.png" width="600">
@@ -117,7 +109,7 @@ Particular attention was given to services allowing authentication or file trans
 
 An exposed FTP service was accessed using valid credentials, allowing interaction with the remote system.
 
-### 📸 Figure 5 — FTP Access and File Retrieval
+### 📸 Figure 4 — FTP Access and File Retrieval
 
 <div align="center">
   <img src="../images/image 129.png" width="600">
