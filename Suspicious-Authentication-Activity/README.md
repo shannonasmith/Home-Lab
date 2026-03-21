@@ -62,6 +62,14 @@ index=main sourcetype=linux_secure "Failed password"
 
 ---
 
+<div align="center">
+  <img src="images/image.png" width="600">
+</div>
+
+<p align="center"><em>Figure 1. Failed login activity showing repeated authentication attempts across users and source IPs.</em></p>
+
+---
+
 ### 📊 Detection — Successful Logins
 
 ```spl
@@ -70,6 +78,14 @@ index=main sourcetype=linux_secure "Accepted password"
 ```
 
 ➡️ Shows successful authentication patterns  
+
+---
+
+<div align="center">
+  <img src="images/image 1.png" width="600">
+</div>
+
+<p align="center"><em>Figure 2. Successful authentication events used to correlate potential compromise after failed attempts.</em></p>
 
 ---
 
@@ -98,6 +114,14 @@ index=main sourcetype=linux_secure
 ```
 
 ➡️ Identifies top attacking sources  
+
+---
+
+<div align="center">
+  <img src="images/image 2.png" width="600">
+</div>
+
+<p align="center"><em>Figure 3. Source IP activity highlighting repeated login attempts from specific hosts.</em></p>
 
 ---
 
