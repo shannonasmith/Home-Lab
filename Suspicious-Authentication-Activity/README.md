@@ -152,7 +152,9 @@ Observed patterns:
 
 - suspicious login behavior identified  
 - repeated authentication attempts detected  
-- abnormal access patterns observed  
+- abnormal access patterns observed
+
+Observed repeated authentication attempts from a single source IP targeting multiple user accounts, followed by successful login activity, indicating potential credential compromise.
 
 ---
 
