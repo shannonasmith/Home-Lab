@@ -54,7 +54,7 @@ Subdomain discovery was performed to expand the attack surface and identify addi
 📸 Figure 1 — Subdomain Enumeration
 
 <div align="center">
-  <img src="../images/image 28.png" width="600">
+  <img src="../images/image 171.png" width="600">
 </div>
 
 <p align="center"><em>Subdomain enumeration revealed additional hosts associated with the target domain, increasing the potential attack surface.</em></p>
@@ -109,7 +109,7 @@ Analysis of the scan results revealed:
 - potential misconfigurations  
 - services suitable for further exploitation  
 
-Additional scans confirmed UDP services and RPC exposure.
+Particular attention was given to services allowing authentication or file transfer.
 
 ---
 
