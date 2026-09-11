@@ -33,15 +33,15 @@ The assessment focused on combining multiple tools and techniques to simulate re
 
 ```text
 Subdomain Enumeration
-↓
+         ↓
 Web Enumeration (ffuf + dirb)
-↓
+         ↓
 Network Scanning (nmap)
-↓
+         ↓
 Service Analysis
-↓
+         ↓
 Access via Exposed Service (FTP)
-↓
+         ↓
 Data Retrieval
 ```
 
